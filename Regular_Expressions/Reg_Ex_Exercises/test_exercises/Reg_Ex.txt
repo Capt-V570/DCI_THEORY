@@ -1,0 +1,15 @@
+BRAVO - what does '\w' and '+' do?  + example: 
+
+\w = Matches any letter, digit or underscore. Equivalent to [a-zA-Z0-9_].
+
+EXAMPLE: 
+
+
+
++ = [+] usually is a repetition operator, and causes the preceding token to repeat one or more times. 
+
+a+ would be expressed as aa* in formal language theory, and could also be expressed as a{1,} (match a minimum of 1 times and a maximum of infinite times)
+
+EXAMPLE: 
+
+

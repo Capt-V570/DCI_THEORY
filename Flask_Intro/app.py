@@ -46,8 +46,20 @@ HTTP Verbs - action word, doing word - "to be", "tun", "fare", "me bo",
 # dictionary.update({"name": "Wojciech Sr", "location": "Munich"})
 
 # using a library
+
+
 from flask import Flask, jsonify, request
 import psycopg2
+
+connection = psycopg2.connect(
+    user="postgres",
+    password="postgres",
+    host="localhost",
+    port="5432",  # database
+    database="flask_intro",
+)
+
+cur = connection.cursor()
 
 # instantiating a class (Flask)
 app = Flask(__name__)
@@ -59,22 +71,101 @@ REMINDERS = []
 @app.route("/")
 # Function
 def index():
+    # Fetch all the reminders from the database
+    cur.execute("SELECT * FROM reminders;")
+
+    # store in a variable
+    reminder_data = cur.fetchall()  # get a list of TUPLES !
+    print(reminder_data)
+
+    columns = ["title", "description"]
+    list_of_dictonary = []
+    for item_in_tuple in reminder_data:
+        temp_dict = {}
+        # for index, value in enumerate(columns):
+        #     temp_dict[columns[index]] = item_in_tuple[index]
+
+        temp_dict["title"] = item_in_tuple[0]  # Mirjam ...
+        temp_dict["description"] = item_in_tuple[1]  # She is ...
+
+        list_of_dictonary.append(temp_dict)
+
     # JSON ->
-    return jsonify({"name": "Nadia"})
+    return jsonify({"reminders": list_of_dictonary})
     # return jsonify("hello am a string")
     # return jsonify([{"name": "Shaban"}, {"name": "Fausto"}, (1,2,3)])
 
 
+"""
+    # TODO: Exercise for the day (Submit on Tuesday):
+    # Without using `pyscop2.extras.DictCursor`, make changes to the output
+    # to return the following - a list of dictionaries
+    # Instead of {
+    "reminders": [
+        [
+            "Mirjam is awesome",
+            "She is learning to code"
+        ],
+        [
+            "Eat",
+            "Food is healthy"
+        ],
+        [
+            "Exercise",
+            "Get your heart moving"
+        ]
+        ]
+    }
+
+    Return the following:
+    }
+    "reminders": [
+        {
+            "title": "Mirjam is awesome",
+            "description": "She is learning to code"
+        },
+        {
+            "title": "Eat",
+            "description": "Food is healthy"
+        },
+        {
+            "title": "Exercise",
+            "description": "Get your heart moving"
+        }
+    ]
+    }
+"""
+
+
 # we want to store "reminders"
 #
+# GET
+# POST
+# DELETE
+# PATCH
+# PUT
 # how do we save the reminders?
 
-
+# Decorator -- URL path call add-reminder
 @app.route("/add-reminder", methods=["POST"])
 def add_reminder():
-    # Exercise, add the reminders (dictionaries) to the REMINDERS constant
-    # write code here
-    REMINDERS.append(request.json)
+    try:
+        title = request.json["title"]
+    except KeyError:
+        title = None
+
+    # handle the exception (error handling)
+    try:
+        description = request.json["description"]
+    except KeyError:
+        description = None
+    # Null
+    print(f"INSERT INTO reminders (title, description) VALUES({title}, {description});")
+    cur.execute(
+        f"INSERT INTO reminders (title, description) VALUES('{title}', '{description}');"
+    )
+    connection.commit()
+    print(title, description)
     # change the return value from empty list to have REMINDERS instead
     return jsonify({"reminders": REMINDERS})
 
@@ -86,4 +177,4 @@ def add_reminder():
 # - PATCH
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True, port=5050)
+    app.run(host="0.0.0.0", debug=True, port=5050)  # port for flask

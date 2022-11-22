@@ -98,7 +98,7 @@ def index():
 
 
 """
-    # TODO: Exercise for the day (Submit on Tuesday):
+    # DONE: Exercise for the day (Submit on Tuesday):
     # Without using `pyscop2.extras.DictCursor`, make changes to the output
     # to return the following - a list of dictionaries
     # Instead of {
@@ -200,17 +200,30 @@ def delete_reminder(id):
 # Garbage colletion (memory management)
 @app.route("/reminders/<int:id>/update", methods=["PUT"])
 def update_reminder(id):
-    cur.execute(
-        f"""
-        UPDATE reminders
-        SET title='{request.json.get('title')}',
-        description='{request.json.get('description')}'
-        WHERE id={id}
-    """
-    )
-    connection.commit()
+    # connection = None
+    # update_reminder = 0
+    try:
+        cur.execute(
+            f"""
+            UPDATE reminders
+            SET title='{request.json.get('title')}',
+            description='{request.json.get('description')}'
+            WHERE id={id}
+        """
+        )
+        # Exercise: Return the updated information as a dictionary
+        # update_reminder = cur.rowcount()
+        cur.rowcount()
+        connection.commit()
+        # cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
+
     # Exercise: Return the updated information as a dictionary
-    return jsonify({})
+    return jsonify({"message": "Entry successfully updated within 'reminders' Table!"})
 
 
 # Core HTTP verbs a developer must know

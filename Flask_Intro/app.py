@@ -76,6 +76,7 @@ def index():
 
     # store in a variable
     reminder_data = cur.fetchall()  # get a list of TUPLES !
+    # reminder_data = [{"title": item[0], "description": item[1]} for item in reminder_data ] # list comprehension
     print(reminder_data)
 
     columns = ["title", "description"]
@@ -170,10 +171,53 @@ def add_reminder():
     return jsonify({"reminders": REMINDERS})
 
 
+@app.route("/reminders/<int:id>")
+def reminder(id):
+    cur.execute(f"SELECT * FROM reminders WHERE id = {id};")
+    reminder_data = cur.fetchone()
+    try:
+        reminder_dict = {
+            "id": id,
+            "title": reminder_data[0],
+            "description": reminder_data[1],
+        }
+        return jsonify(reminder_dict)
+    except:
+        return jsonify({"message": "Sorry something bad happened"}), 500
+
+
+# DELETE
+@app.route("/reminders/<int:id>", methods=["DELETE"])
+def delete_reminder(id):
+    # TODO: Write a query that deletes a reminder
+    cur.execute(f"DELETE FROM reminders WHERE id={id};")
+    # commit the changes
+    connection.commit()
+    return jsonify({"message": "Successfully deleted!"})
+
+
+# what if we have 1000+ connections?
+# Garbage colletion (memory management)
+@app.route("/reminders/<int:id>/update", methods=["PUT"])
+def update_reminder(id):
+    cur.execute(
+        f"""
+        UPDATE reminders
+        SET title='{request.json.get('title')}',
+        description='{request.json.get('description')}'
+        WHERE id={id}
+    """
+    )
+    connection.commit()
+    # Exercise: Return the updated information as a dictionary
+    return jsonify({})
+
+
 # Core HTTP verbs a developer must know
 # - GET
 # - POST
 # - DELETE
+# - PUT
 # - PATCH
 
 if __name__ == "__main__":

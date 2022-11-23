@@ -17,10 +17,10 @@ def get_connection():
 # IF the code above is denied permission, use this code instead:
 # def get_connection():
 #     conn = psycopg2.connect(
-#         database="november",
-#         user = "postgres",
-#         host = "5432",
-#         password = "postgres")
+#     database="november",
+#     user = "postgres",
+#     host = "5432",
+#     password = "postgres")
 #     cur = conn.cursor()
 #     return (conn, cur) # Tuple
 

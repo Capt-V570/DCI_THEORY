@@ -49,6 +49,12 @@ class Human:
         name = f"{self.first_name} {self.last_name}"
         cur.execute(f"INSERT INTO users(name) VALUES('{name}')")
         write_to_db(connection)
+        # names_dictonary = {
+        #     "id": id,
+        #     "first_name": self.first_name,
+        #     "last_name": self.last_name,
+        # }
+        # return names_dictonary
 
     # ORM -> Object Relation Mappers
     # Classes -> tables (methods represent SQL actions)

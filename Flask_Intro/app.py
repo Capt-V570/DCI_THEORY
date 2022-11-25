@@ -1,19 +1,34 @@
-# TODO: Goal -> https://github.com/Python-E03/live-coding-reminder-application-teamrando/issues/45 
+# TODO: Goal -> https://github.com/Python-E03/live-coding-reminder-application-teamrando/issues/45
 
 from flask import Flask, jsonify, request
 import psycopg2
 
-connection = psycopg2.connect(
-    user="postgres",
-    password="postgres",
-    host="localhost",
-    port="5432",
-    database="flask_intro",
-)
+# ORM -> Object Relational Mapper
+# “Class” - represents the Table (relation)
+# an instance of that class (object), refers to the single record in the table
+# Designers have to make some choices
+# Algorithim
+# - Create instance of the class
+# - then call the save() method of that instance
+# mirjam = Person(1, ‘Mirjam’, ‘L’)
+# mirjam.save() # --> SQL? --> INSERT
+# mirjam.delete() # --> SQL ? -- DELETE
+# mirjam.update() # --> SQL ? -- UPDATE people SET
+# static method?
+# Person.find(23) # --> SQL ? -- SELECT * FROM people WHERE id=23;
+# class Person:
+#     def __init__(self, id, name, location) -> None:
+#         self.id = id
+#         self.name = name
+#         self.location = location
+# mirjam = Person(1, ‘Mirjam’, ‘L’) # “mirjam” - instance of a class -> record in the table
+# x = Person(2, ‘X’, ‘L’) # “mirjam” - instance of a class -> record in the table
+# y = Person(3, ‘Y’, ‘L’) # “mirjam” - instance of a class -> record in the table
+# z = Person(4, ‘Z’, ‘L’) # “mirjam” - instance of a class -> record in the table
 
-cur = connection.cursor()
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def index():
@@ -25,6 +40,7 @@ def index():
         for item in reminder_data
     ]
     return jsonify({"reminders": reminder_data})
+
 
 @app.route("/add-reminder", methods=["POST"])
 def add_reminder():
@@ -79,7 +95,7 @@ def update_reminder(id):
     cur.execute(
         f"""
         UPDATE reminders
-        SET title='{request.json.get('title')}', 
+        SET title='{request.json.get('title')}',
         description='{request.json.get('description')}'
         WHERE id={id} RETURNING id, title, description
     """

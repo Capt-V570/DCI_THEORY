@@ -1,6 +1,4 @@
-# TODO: Goal -> https://github.com/Python-E03/live-coding-reminder-application-teamrando/issues/45 
-
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 import psycopg2
 
 connection = psycopg2.connect(
@@ -13,7 +11,9 @@ connection = psycopg2.connect(
 
 cur = connection.cursor()
 
+# instantiating a class (Flask)
 app = Flask(__name__)
+
 
 @app.route("/")
 def index():
@@ -26,6 +26,8 @@ def index():
     ]
     return jsonify({"reminders": reminder_data})
 
+
+# Decorator -- URL path call add-reminder
 @app.route("/add-reminder", methods=["POST"])
 def add_reminder():
     try:
@@ -76,18 +78,30 @@ def delete_reminder(id):
 
 @app.route("/reminders/<int:id>/update", methods=["PUT"])
 def update_reminder(id):
+    # DONE: Fix the error that shows up when someone tries to update
+    # a non existing reminder in the table
+    # hint: exeption handling
+    breakpoint()
     cur.execute(
         f"""
         UPDATE reminders
-        SET title='{request.json.get('title')}', 
+        SET title='{request.json.get('title')}',
         description='{request.json.get('description')}'
         WHERE id={id} RETURNING id, title, description
     """
     )
     values = cur.fetchone()
-    connection.commit()
+    # if values == "*** NameError: name 'values' is not defined":
+    #     return jsonify({"message": "Method Not Allowed"}), 405
     try:
-        return jsonify({"id": values[0], "title": values[1], "description": values[2]})
+        values = {
+            "id": id,
+            "title": values[0],
+            "description": values[1],
+        }
+        connection.commit()
+        return jsonify(values)
+        # return jsonify({"id": values[0], "title": values[1], "description": values[2]})
     except TypeError:
         return jsonify({"message": "Reminder not found"}), 404
 
